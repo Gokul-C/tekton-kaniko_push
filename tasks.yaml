@@ -143,11 +143,14 @@ spec:
     - name: kaniko-task
       image: $(params.BUILDER_IMAGE)
       workingDir: $(workspaces.task-ws.path)/kaniko-image-building3
-      env:
-        - name: DOCKER_CONFIG
-          value: docker-creds
+      #env:
+      #  - name: DOCKER_CONFIG
+      #    value: docker-creds
       securityContext:
         runAsUser: 0
+      volumeMounts:
+      - name: config-volume
+        mountPath: /kaniko/.docker
       command:
         - /kaniko/executor
         - $(params.EXTRA_ARGS)
@@ -155,3 +158,6 @@ spec:
         - --context=.  # The user does not need to care the workspace and the source.
         - --destination=$(params.IMAGE)
         - --oci-layout-path=$(workspaces.task-ws.path)/kaniko-image-building3/image-digest
+  volumes:
+    - name: config-volume
+      emptyDir: {}
